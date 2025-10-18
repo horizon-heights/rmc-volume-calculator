@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horizon Heights RMC Volume Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .gradient-button {
+            background-image: linear-gradient(to right, #3B82F6, #4F46E5);
+            @apply text-white font-bold rounded-lg shadow-lg transition duration-300 transform hover:scale-[1.02] hover:shadow-xl;
+        }
+        .gradient-button:hover {
+            background-image: linear-gradient(to right, #2563EB, #4338CA);
+        }
+        .merged-text-result {
+            @apply w-full font-bold text-lg py-3 px-0 inline-block text-gray-500 dark:text-gray-400;
+        }
+        .merged-text-result.active-result {
+            @apply text-gray-900 dark:text-white;
+        }
+        /* Simple transition for modal */
+        .modal-enter {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        .modal-enter-active {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 200ms, transform 200ms;
+        }
+        .modal-exit {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .modal-exit-active {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 200ms, transform 200ms;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0"
+  }
+}
+</script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 min-h-screen flex items-center justify-center p-4 transition-colors duration-300">
+    <div id="root"></div>
+</body>
+</html>

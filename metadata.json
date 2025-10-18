@@ -1,0 +1,5 @@
+{
+  "name": "Horizon Heights RMC Volume Calculator",
+  "description": "A web application to calculate the required volume of Ready-Mix Concrete (RMC) for footings, including a wastage factor. It features built-in unit converters for feet and meters to inches to simplify dimension inputs.",
+  "requestFramePermissions": []
+}
