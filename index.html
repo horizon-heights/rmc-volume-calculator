@@ -25,10 +25,17 @@
         }
         .gradient-button {
             background-image: linear-gradient(to right, #3B82F6, #4F46E5);
-            @apply text-white font-bold rounded-lg shadow-lg transition duration-300 transform hover:scale-[1.02] hover:shadow-xl;
+            color: white;
+            font-weight: 700;
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); /* shadow-lg */
+            transition: all 0.3s ease-in-out;
+            transform: scale(1);
         }
         .gradient-button:hover {
             background-image: linear-gradient(to right, #2563EB, #4338CA);
+            transform: scale(1.02);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); /* shadow-xl */
         }
         .merged-text-result {
             @apply w-full font-bold text-lg py-3 px-0 inline-block text-gray-500 dark:text-gray-400;
