@@ -75,10 +75,10 @@ const App: React.FC = () => {
   };
 
   const getUnitButtonClass = (isActive: boolean) => 
-    `px-3 py-1 rounded-md text-sm font-semibold transition-all duration-200 ${
+    `px-3 py-1 rounded-md text-sm font-semibold transition-all duration-200 text-white ${
       isActive
-      ? 'gradient-button text-white'
-      : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
+      ? 'gradient-button'
+      : 'bg-gray-500 dark:bg-gray-600'
     }`;
 
   return (
