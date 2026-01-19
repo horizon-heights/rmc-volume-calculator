@@ -6,23 +6,19 @@
     <title>Horizon Heights RMC Volume Calculator</title>
     <!-- Manifest file link -->
     <link rel="manifest" href="manifest.json">
-
-    <!-- Favicon for browser tab -->
     <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
-
-    <!-- Apple touch icon (for Add to Home Screen) -->
     <link rel="apple-touch-icon" href="logo.png">
-
-    <!-- Theme color for mobile browsers -->
     <meta name="theme-color" content="#000000">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
+        body { font-family: 'Inter', sans-serif; }
         .gradient-button {
             background-image: linear-gradient(to right, #3B82F6, #4F46E5);
             color: white;
@@ -37,21 +33,335 @@
             transform: scale(1.02);
             box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
         }
+        .merged-text-result {
+            width: 100%;
+            font-weight: 700;
+            font-size: 1.125rem;
+            padding: 0.75rem 0;
+            display: inline-block;
+            color: #6b7280;
+        }
+        .dark .merged-text-result { color: #9ca3af; }
+        .merged-text-result.active-result { color: #111827; }
+        .dark .merged-text-result.active-result { color: #ffffff; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
     </style>
+
     <script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@19.0.0",
-    "react-dom": "https://esm.sh/react-dom@19.0.0",
-    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/"
-  }
-}
-</script>
+    {
+      "imports": {
+        "react": "https://esm.sh/react@19.0.0",
+        "react-dom": "https://esm.sh/react-dom@19.0.0",
+        "react-dom/client": "https://esm.sh/react-dom@19.0.0/client"
+      }
+    }
+    </script>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 min-h-screen flex items-center justify-center p-4 transition-colors duration-300">
     <div id="root" class="w-full flex justify-center"></div>
-    <script type="module" src="index.tsx"></script>
+
+    <script type="text/babel" data-type="module">
+        import React, { useState, useEffect } from 'react';
+        import ReactDOM from 'react-dom/client';
+
+        // --- Types ---
+        const DimensionUnit = {
+            INCHES: 'inches',
+            METERS: 'meters',
+            FEET: 'feet',
+        };
+
+        // --- Components ---
+        const CalculatorIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 14h.01M12 11h.01M12 8h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+        );
+
+        const ConverterModal = ({ isOpen, onClose, onAddToDimension }) => {
+            const [feetInput, setFeetInput] = useState('');
+            const [meterInput, setMeterInput] = useState('');
+            const [feetToInchResult, setFeetToInchResult] = useState(null);
+            const [meterToInchResult, setMeterToInchResult] = useState(null);
+
+            useEffect(() => {
+                if (!isOpen) {
+                    setFeetInput('');
+                    setMeterInput('');
+                    setFeetToInchResult(null);
+                    setMeterToInchResult(null);
+                }
+            }, [isOpen]);
+
+            const handleFeetChange = (e) => {
+                const value = e.target.value;
+                setFeetInput(value);
+                const feet = parseFloat(value);
+                if (!isNaN(feet) && feet >= 0) setFeetToInchResult(feet * 12);
+                else setFeetToInchResult(null);
+            };
+
+            const handleMeterChange = (e) => {
+                const value = e.target.value;
+                setMeterInput(value);
+                const meters = parseFloat(value);
+                const INCH_PER_METER = 39.3701;
+                if (!isNaN(meters) && meters >= 0) setMeterToInchResult(meters * INCH_PER_METER);
+                else setMeterToInchResult(null);
+            };
+
+            const handleAdd = (target, source) => {
+                const value = source === 'ft' ? feetToInchResult : meterToInchResult;
+                if (value !== null) {
+                    onAddToDimension(target, value);
+                    onClose();
+                }
+            };
+
+            if (!isOpen) return null;
+
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
+                    <div className="absolute inset-0" onClick={onClose}></div>
+                    <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 z-10 animate-fade-in">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 border-b pb-2 border-gray-300 dark:border-gray-600">Unit Converters</h3>
+                        <div className="space-y-6">
+                            <div className="py-3">
+                                <h4 className="text-md font-medium text-gray-800 dark:text-gray-200 mb-2">Feet to Inch</h4>
+                                <div className="flex gap-2 items-end">
+                                    <div className="flex-grow min-w-0">
+                                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Feet (ft)</label>
+                                        <input type="number" value={feetInput} onChange={handleFeetChange} className="w-full p-3 bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 border rounded-lg text-gray-900 dark:text-white" placeholder="e.g., 21" />
+                                    </div>
+                                    <p className="text-xl text-gray-500 dark:text-gray-400 mb-1">=</p>
+                                    <div className="flex-grow min-w-0">
+                                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Inches (in)</label>
+                                        <span className={`merged-text-result ${feetToInchResult !== null ? 'active-result' : ''}`}>{feetToInchResult !== null ? feetToInchResult.toFixed(2) : 'Result'}</span>
+                                    </div>
+                                </div>
+                                <div className="mt-3 flex flex-wrap justify-center gap-2">
+                                    <button className="gradient-button px-3 py-1.5 text-xs" onClick={() => handleAdd('length', 'ft')}>Add Length</button>
+                                    <button className="gradient-button px-3 py-1.5 text-xs" onClick={() => handleAdd('width', 'ft')}>Add Width</button>
+                                    <button className="gradient-button px-3 py-1.5 text-xs" onClick={() => handleAdd('depth', 'ft')}>Add Depth</button>
+                                </div>
+                            </div>
+                            <div className="py-3">
+                                <h4 className="text-md font-medium text-gray-800 dark:text-gray-200 mb-2">Meter to Inch</h4>
+                                <div className="flex gap-2 items-end">
+                                    <div className="flex-grow min-w-0">
+                                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Meter (m)</label>
+                                        <input type="number" value={meterInput} onChange={handleMeterChange} className="w-full p-3 bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 border rounded-lg text-gray-900 dark:text-white" placeholder="e.g., 6.4" />
+                                    </div>
+                                    <p className="text-xl text-gray-500 dark:text-gray-400 mb-1">=</p>
+                                    <div className="flex-grow min-w-0">
+                                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Inches (in)</label>
+                                        <span className={`merged-text-result ${meterToInchResult !== null ? 'active-result' : ''}`}>{meterToInchResult !== null ? meterToInchResult.toFixed(2) : 'Result'}</span>
+                                    </div>
+                                </div>
+                                <div className="mt-3 flex flex-wrap justify-center gap-2">
+                                    <button className="gradient-button px-3 py-1.5 text-xs" onClick={() => handleAdd('length', 'm')}>Add Length</button>
+                                    <button className="gradient-button px-3 py-1.5 text-xs" onClick={() => handleAdd('width', 'm')}>Add Width</button>
+                                    <button className="gradient-button px-3 py-1.5 text-xs" onClick={() => handleAdd('depth', 'm')}>Add Depth</button>
+                                </div>
+                            </div>
+                        </div>
+                        <button onClick={onClose} className="w-full py-2 mt-8 gradient-button">Close</button>
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [dimensions, setDimensions] = useState({
+                length: { main: '', sub: '' },
+                width: { main: '', sub: '' },
+                depth: { main: '', sub: '' },
+            });
+            const [units, setUnits] = useState({
+                length: DimensionUnit.INCHES,
+                width: DimensionUnit.INCHES,
+                depth: DimensionUnit.INCHES,
+            });
+            const [result, setResult] = useState(null);
+            const [error, setError] = useState(null);
+            const [isModalOpen, setIsModalOpen] = useState(false);
+            const [history, setHistory] = useState([]);
+
+            const handleDimensionChange = (dim, part, value) => {
+                let finalValue = value;
+                if (units[dim] === DimensionUnit.FEET && part === 'sub' && value !== '') {
+                    const numVal = parseInt(value, 10);
+                    if (!isNaN(numVal)) {
+                        if (numVal < 0) finalValue = '0';
+                        else if (numVal > 11) finalValue = '11';
+                    }
+                }
+                setDimensions(prev => ({ ...prev, [dim]: { ...prev[dim], [part]: finalValue } }));
+            };
+
+            const calculateVolume = () => {
+                setResult(null);
+                setError(null);
+                const getDimInMeters = (key) => {
+                    const val = dimensions[key];
+                    const unit = units[key];
+                    const main = parseFloat(val.main);
+                    const sub = parseFloat(val.sub || '0');
+                    if (isNaN(main) || main < 0) return null;
+                    const INCH_TO_M = 0.0254;
+                    const FEET_TO_M = 0.3048;
+                    if (unit === DimensionUnit.INCHES) return main * INCH_TO_M;
+                    if (unit === DimensionUnit.METERS) return main;
+                    if (unit === DimensionUnit.FEET) return (main + (Math.max(0, Math.min(11, sub)) / 12)) * FEET_TO_M;
+                    return 0;
+                };
+
+                const lM = getDimInMeters('length');
+                const wM = getDimInMeters('width');
+                const dM = getDimInMeters('depth');
+
+                if (lM === null || wM === null || dM === null || lM <= 0 || wM <= 0 || dM <= 0) {
+                    setError('Please enter valid positive values for all dimensions.');
+                    return;
+                }
+
+                const finalVolumeM3 = (lM * wM * dM) * 1.03;
+                const formatted = finalVolumeM3.toFixed(2);
+                setResult(formatted);
+
+                const formatDisplay = (dim) => {
+                    const u = units[dim];
+                    const v = dimensions[dim];
+                    if (u === DimensionUnit.FEET) return `${v.main}' ${v.sub}"`;
+                    if (u === DimensionUnit.METERS) return `${v.main}m`;
+                    return `${v.main}"`;
+                };
+
+                setHistory(prev => [...prev, {
+                    id: Date.now().toString(),
+                    length: formatDisplay('length'),
+                    width: formatDisplay('width'),
+                    depth: formatDisplay('depth'),
+                    volume: finalVolumeM3
+                }]);
+            };
+
+            const clearHistory = (e) => {
+                e.preventDefault();
+                if (window.confirm('Delete all entries?')) {
+                    setHistory([]);
+                    setResult(null);
+                }
+            };
+
+            const totalVolume = history.reduce((sum, item) => sum + item.volume, 0);
+
+            const renderInput = (dim, label) => {
+                const isFeet = units[dim] === DimensionUnit.FEET;
+                const placeholders = { [DimensionUnit.INCHES]: '252', [DimensionUnit.METERS]: '6.4', [DimensionUnit.FEET]: '21' };
+                
+                return (
+                    <div key={dim}>
+                        <div className="flex justify-between items-center mb-2">
+                            <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{label}</label>
+                            <div className="flex gap-1">
+                                {[DimensionUnit.METERS, DimensionUnit.FEET, DimensionUnit.INCHES].map(u => (
+                                    <button key={u} onClick={() => setUnits(p => ({ ...p, [dim]: u }))} 
+                                            className={`px-2.5 py-1 rounded-md text-xs font-bold transition-all ${units[dim] === u ? 'gradient-button' : 'bg-gray-500 text-white'}`}>
+                                        {u === 'meters' ? 'm' : u === 'feet' ? 'ft' : 'in'}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="flex gap-2">
+                            <div className="flex-grow relative">
+                                <input type="number" value={dimensions[dim].main} onChange={e => handleDimensionChange(dim, 'main', e.target.value)}
+                                       className="w-full p-3 bg-gray-200 dark:bg-gray-700 border rounded-lg text-gray-900 dark:text-white" placeholder={`e.g., ${placeholders[units[dim]]}`} />
+                                {isFeet && <span className="absolute right-3 top-3 text-gray-400 text-sm">ft</span>}
+                            </div>
+                            {isFeet && (
+                                <div className="w-1/3 relative">
+                                    <input type="number" min="0" max="11" value={dimensions[dim].sub} onChange={e => handleDimensionChange(dim, 'sub', e.target.value)}
+                                           className="w-full p-3 bg-gray-200 dark:bg-gray-700 border rounded-lg text-gray-900 dark:text-white" placeholder="in" />
+                                    <span className="absolute right-3 top-3 text-gray-400 text-sm">in</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+            };
+
+            return (
+                <div className="flex flex-col items-center w-full gap-8 py-8">
+                    <div className="relative w-full max-w-lg bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700">
+                        <header className="mb-6 text-center">
+                            <h1 className="text-4xl font-extrabold text-blue-600">Horizon Heights</h1>
+                            <p className="text-lg font-medium text-gray-500 dark:text-gray-400">RMC Volume Calculator</p>
+                        </header>
+                        <div className="p-6 mb-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg shadow-inner">
+                            <h2 className="text-3xl font-extrabold text-gray-800 dark:text-gray-100 text-center mb-4">Concrete Volume Tools</h2>
+                            <div className="space-y-6">
+                                {renderInput('length', 'Length')}
+                                {renderInput('width', 'Width')}
+                                {renderInput('depth', 'Depth')}
+                            </div>
+                        </div>
+                        <button onClick={calculateVolume} className="w-full py-3 mt-6 gradient-button">Calculate Concrete Volume (M³)</button>
+                        {result && (
+                            <div className="mt-8 p-5 bg-green-100 dark:bg-green-900/50 rounded-lg text-center animate-fade-in">
+                                <p className="text-gray-700 dark:text-gray-300 text-sm mb-2">Total Order Quantity <strong>(3% Wastage)</strong>:</p>
+                                <p className="text-5xl font-extrabold text-green-600 dark:text-green-400">{result} m³</p>
+                            </div>
+                        )}
+                        {error && <div className="mt-4 p-3 bg-red-100 text-red-800 rounded-lg text-center">{error}</div>}
+                    </div>
+
+                    {history.length > 0 && (
+                        <div className="w-full max-w-2xl bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl animate-fade-in">
+                            <div className="flex justify-between items-center mb-4 border-b pb-4 dark:border-gray-600">
+                                <h3 className="text-2xl font-bold dark:text-white">Calculation Summary</h3>
+                                <button type="button" onClick={clearHistory} className="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-bold shadow-md hover:bg-red-600 active:scale-95 transition-all">Delete All</button>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left">
+                                    <thead>
+                                        <tr className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                            <th className="p-3 border dark:border-gray-600 font-bold">Length</th>
+                                            <th className="p-3 border dark:border-gray-600 font-bold">Width</th>
+                                            <th className="p-3 border dark:border-gray-600 font-bold">Depth</th>
+                                            <th className="p-3 border dark:border-gray-600 font-bold text-right">Volume (m³)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {history.map(item => (
+                                            <tr key={item.id} className="dark:text-gray-400 border-b dark:border-gray-600">
+                                                <td className="p-3">{item.length}</td>
+                                                <td className="p-3">{item.width}</td>
+                                                <td className="p-3">{item.depth}</td>
+                                                <td className="p-3 text-right font-semibold text-blue-600 dark:text-blue-400">{item.volume.toFixed(2)}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr className="bg-blue-50 dark:bg-blue-900/40">
+                                            <td colSpan={3} className="p-3 font-extrabold text-right uppercase dark:text-white">TOTAL VOLUME:</td>
+                                            <td className="p-3 text-right font-black text-2xl text-blue-700 dark:text-blue-300">{totalVolume.toFixed(2)} m³</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+                    <button onClick={() => setIsModalOpen(true)} className="fixed bottom-6 right-6 w-16 h-16 bg-blue-600 rounded-full shadow-lg text-white flex items-center justify-center hover:bg-blue-700 transition transform hover:scale-110"><CalculatorIcon /></button>
+                    <ConverterModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAddToDimension={(target, val) => setDimensions(prev => ({ ...prev, [target]: { main: val.toFixed(2), sub: '' } }))} />
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<React.StrictMode><App /></React.StrictMode>);
+    </script>
 </body>
 </html>
