@@ -27,45 +27,31 @@
             background-image: linear-gradient(to right, #3B82F6, #4F46E5);
             color: white;
             font-weight: 700;
-            border-radius: 0.5rem; /* rounded-lg */
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); /* shadow-lg */
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
             transition: all 0.3s ease-in-out;
             transform: scale(1);
         }
         .gradient-button:hover {
             background-image: linear-gradient(to right, #2563EB, #4338CA);
             transform: scale(1.02);
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); /* shadow-xl */
-        }
-        .merged-text-result {
-            width: 100%;
-            font-weight: 700;
-            font-size: 1.125rem;
-            padding: 0.75rem 0;
-            display: inline-block;
-            color: #6b7280; /* text-gray-500 */
-        }
-        .dark .merged-text-result {
-            color: #9ca3af; /* text-gray-400 */
-        }
-        .merged-text-result.active-result {
-            color: #111827; /* text-gray-900 */
-        }
-        .dark .merged-text-result.active-result {
-            color: #ffffff; /* text-white */
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
         }
     </style>
     <script type="importmap">
-    {
-      "imports": {
-        "react": "https://aistudiocdn.com/react@^19.2.0",
-        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-        "react/": "https://aistudiocdn.com/react@^19.2.0/"
-      }
-    }
-    </script>
+{
+  "imports": {
+    "react": "https://esm.sh/react@19.0.0",
+    "react-dom": "https://esm.sh/react-dom@19.0.0",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/"
+  }
+}
+</script>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 min-h-screen flex items-center justify-center p-4 transition-colors duration-300">
     <div id="root" class="w-full flex justify-center"></div>
+    <script type="module" src="index.tsx"></script>
 </body>
 </html>

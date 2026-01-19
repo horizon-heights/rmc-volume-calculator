@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dimensions, DimensionUnit, DimensionValue } from './types';
 import ConverterModal from './components/ConverterModal';
@@ -102,7 +101,6 @@ const App: React.FC = () => {
     const formattedResult = finalVolumeM3.toFixed(2);
     setResult(formattedResult);
 
-    // Format display strings for history
     const formatDisplay = (dim: keyof Dimensions) => {
         const u = units[dim];
         const v = dimensions[dim];
@@ -111,7 +109,6 @@ const App: React.FC = () => {
         return `${v.main}"`;
     };
 
-    // Add to history
     const newItem: HistoryItem = {
         id: Date.now().toString(),
         length: formatDisplay('length'),
@@ -123,7 +120,7 @@ const App: React.FC = () => {
   };
 
   const clearHistory = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent any default behavior
+    e.preventDefault();
     if (window.confirm('Are you sure you want to delete all entries?')) {
         setHistory([]);
         setResult(null);
@@ -203,7 +200,7 @@ const App: React.FC = () => {
         </header>
 
         <div className="p-6 mb-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg shadow-inner">
-          <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-800 dark:text-gray-100 text-center mb-6 w-[95%] mx-auto font-sans">Concrete Volume Tools</h2>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-800 dark:text-gray-100 text-center mb-4 w-[95%] mx-auto font-sans">Concrete Volume Tools</h2>
 
           <div className="w-full">
             <div className="p-6 bg-transparent rounded-lg">
