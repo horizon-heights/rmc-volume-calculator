@@ -66,14 +66,12 @@
         import React, { useState, useEffect } from 'react';
         import ReactDOM from 'react-dom/client';
 
-        // --- Types ---
         const DimensionUnit = {
             INCHES: 'inches',
             METERS: 'meters',
             FEET: 'feet',
         };
 
-        // --- Components ---
         const CalculatorIcon = () => (
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 14h.01M12 11h.01M12 8h.01M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -248,18 +246,6 @@
                 }]);
             };
 
-            const clearHistory = (e) => {
-                e.preventDefault();
-                if (window.confirm('Delete all entries?')) {
-                    setHistory([]);
-                    setResult(null);
-                }
-            };
-
-            const deleteRow = (id) => {
-                setHistory(prev => prev.filter(item => item.id !== id));
-            };
-
             const totalVolume = history.reduce((sum, item) => sum + item.volume, 0);
 
             const renderInput = (dim, label) => {
@@ -324,7 +310,7 @@
 
                     {history.length > 0 && (
                         <div className="w-full max-w-2xl bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl animate-fade-in">
-                            <div className="flex justify-between items-center mb-4 border-b pb-4 dark:border-gray-600">
+                            <div className="mb-4 border-b pb-4 dark:border-gray-600">
                                 <h3 className="text-2xl font-bold dark:text-white">Calculation Summary</h3>
                             </div>
                             <div className="overflow-x-auto">
@@ -339,16 +325,12 @@
                                     </thead>
                                     <tbody>
                                         {history.map(item => (
-                                            <tr key={item.id} 
-                                                onClick={() => deleteRow(item.id)}
-                                                title="Click to delete this row"
-                                                className="dark:text-gray-400 border-b dark:border-gray-600 cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors group">
+                                            <tr key={item.id} className="dark:text-gray-400 border-b dark:border-gray-600 transition-colors duration-200 select-none">
                                                 <td className="p-3">{item.length}</td>
                                                 <td className="p-3">{item.width}</td>
                                                 <td className="p-3">{item.depth}</td>
                                                 <td className="p-3 text-right font-semibold text-blue-600 dark:text-blue-400">
                                                     {item.volume.toFixed(2)}
-                                                    <span className="ml-2 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">✕</span>
                                                 </td>
                                             </tr>
                                         ))}
@@ -361,12 +343,10 @@
                                     </tfoot>
                                 </table>
                             </div>
-                            <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <div className="mt-6">
                                 <p className="text-sm text-gray-500 dark:text-gray-400 italic text-center sm:text-left">
-                                    All volumes shown include 3% wastage factor. <br/>
-                                    <span className="text-xs font-semibold text-blue-500 dark:text-blue-400">Tip: Click any row to delete it.</span>
+                                    All volumes include 3% wastage factor.
                                 </p>
-                                <button type="button" onClick={clearHistory} className="px-6 py-2.5 bg-red-500 text-white rounded-lg text-sm font-bold shadow-md hover:bg-red-600 active:scale-95 transition-all">Delete All Calculations</button>
                             </div>
                         </div>
                     )}
